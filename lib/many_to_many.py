@@ -1,55 +1,58 @@
 class Author:
-    def __init__(self,name):      
-        self.name=name
+    all=[]
+    def __init__(self,name):
+        if isinstance(name,str):      
+            self.name=name
+        else:raise ValueError("Name must be a string")
         self._contracts=[]
+        Author.all.append(self)
     
-    def books(self):
-    #   all_author_books=[]
-    #   my_books= [all_books for all_books in Contract.my_contracts  if Contract.author==self.name]
-    #   for a in range(len(my_books)) :
-    #       all_author_books.append(my_books[a]["book"])
-     # return [all_contracts.book for all_contracts in Contract.my_contracts if Contract.author==self]
-       return list(set(all_contracts.books for all_contracts in self._contracts if isinstance(all_contracts.author,Contract.author)))
-   
-    # def contracts(self):
-    #    # return [all_contracts for all_contracts in self._contracts  ]
-    #      return self._contracts# list(set(all_contracts for all_contracts in self._contracts ))
-
+    def books(self):    
+       return [contract.book for contract in Contract.all if contract.author==self]
+    
     def sign_contract(self,book,date,royalties):
+        if not isinstance(book,Book):
+            raise ValueError("Book must be an instance of a book")
+        if not isinstance(royalties,int):
+            raise ValueError("Royalties must be an integer")
+        if not isinstance(date,str):
+            raise ValueError("Date must be a string")
         contract=Contract(self,book,date,royalties)
-        self._contracts.append(contract)
+        return contract
      
     def contracts(self):
         #return [all_contracts for all_contracts in Contract.my_contracts  if Contract.author==self.name]
-         return [contracts for contracts in self._contracts ]
+         return [contract for contract in Contract.all if contract.author==self]
 
     def total_royalties(self):
-        all_royalties=0
-        for contracts in Contract.my_contracts :
-          if Contract.author==self:
-           all_royalties+=contracts.royalties
-        
+        # all_royalties=0
+        # for contracts in Contract.my_contracts :
+        #   if Contract.author==self:
+        #    all_royalties+=contracts.royalties
+        return sum(contract.royalties for contract in Contract.all if contract.author==self)
 
 class Book:
-    my_books=[]
+    all=[]
     def __init__(self,title):
-       # self.name=name
-        self.title=title
-        self.my_books.append(self)
+        if isinstance(title,str):
+          self.title=title
+        else:raise ValueError("The title must be a string")
+        Book.all.append(self)
 
     def books(self):
-        return self.my_books 
+        return self.all
 
     def authors(self):
-        for author in Author.contracts:
-         if isinstance(self.title,author.title):
-           return author.name 
+        # for author in Author.contracts:
+        #  if isinstance(self.title,author.title):
+        #    return author.name 
+        return [contract.author for contract in Contract.all if contract.book==self]
+    
     def contracts(self):
-        for contract in Contract.my_contracts:
-            return contract
-
+       return [contract for contract in Contract.all if contract.book==self]
+    
 class Contract:
-    my_contracts=[]
+    all=[]
     def __init__(self,author,book,date,royalties):
         if isinstance(author,Author):
             self.author=author
@@ -65,7 +68,7 @@ class Contract:
         if isinstance(royalties,int):
             self.royalties=royalties
         else:raise Exception("Royalties must be a string")
-        self.my_contracts.append(self)    
+        self.all.append(self)    
         #Contract.contract_by_date(date)
     @property
     def author(self):
@@ -114,9 +117,8 @@ class Contract:
         except:("Royalty must be  an integer")
     
     @classmethod
-    def contracts_by_date(cls,date):
-        if isinstance(date,cls.date):
-            return cls.my_contracts
+    def contracts_by_date(cls,date):        
+            return [contracts for contracts in Contract.all if contracts.date==date]
 
         
         
